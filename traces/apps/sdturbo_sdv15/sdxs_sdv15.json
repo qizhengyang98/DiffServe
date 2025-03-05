@@ -1,0 +1,22 @@
+{
+    "appID": "131",
+    "appName": "sdturbo_sdv15",
+    "latencySLOInMSec": 5000,
+    "root": {
+        "task": "sdturbo",
+        "model_variants": ["sdturbo"],
+        "children": [
+            {
+                "task": "sdv15",
+                "model_variants": ["sdv15"],
+                "children": [
+                    {
+                        "task": "sink",
+                        "model_variants": ["sink"],
+                        "children": []
+                    }
+                ]
+            }
+        ]
+    }
+}

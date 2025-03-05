@@ -1,0 +1,45 @@
+
+syntax = "proto3";
+
+package pipescaler;
+
+
+service LoadBalancer {
+    rpc LBAlive(LBHeartbeat) returns (LBHeartbeatResponse) {}
+    rpc WorkerSetup(RegisterWorkerAtLB) returns (RegisterWorkerAtLBResponse) {}
+    rpc ClientSetup(RegisterClient) returns (RegisterClientResponse) {}
+}
+
+message LBHeartbeat {
+    string message = 1;
+}
+
+message LBHeartbeatResponse {
+    string message = 1;
+}
+
+message RegisterWorkerAtLB {
+    string hostID = 1;
+    string hostIP = 2;
+    string port = 3;
+    string appID = 4;
+    string task = 5;
+    string loadedModel = 6;
+    int32 infer_level = 7;
+}
+
+message RegisterWorkerAtLBResponse {
+    // Can be replaced by an Enum with a set of expected responses
+    string message = 1;
+}
+
+message RegisterClient {
+    string hostID = 1;
+    string hostIP = 2;
+    string port = 3;
+    string appID = 4;
+}
+
+message RegisterClientResponse {
+    string message = 1;
+}

@@ -1,0 +1,31 @@
+
+syntax = "proto3";
+
+package pipescaler;
+
+
+service Controller {
+    rpc WorkerSetup(RegisterWorker) returns (RegisterWorkerResponse) {}
+    rpc LBSetup(RegisterLB) returns (RegisterLBResponse) {}
+}
+
+message RegisterWorker {
+    string hostID = 1;
+    string hostIP = 2;
+    string hostPort = 3;
+}
+
+message RegisterWorkerResponse {
+    string lbIP = 1;
+    string lbPort = 2;
+    optional string message = 3;
+}
+
+message RegisterLB {
+    string lbIP = 1;
+    string lbPort = 2;
+}
+
+message RegisterLBResponse {
+    string message = 1;
+}

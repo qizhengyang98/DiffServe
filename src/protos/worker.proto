@@ -1,0 +1,95 @@
+
+syntax = "proto3";
+
+package pipescaler;
+
+
+service WorkerDaemon {
+    rpc Heartbeat(HeartbeatRequest) returns (HeartbeatResponse) {}
+    rpc LoadModel(LoadModelRequest) returns (LoadModelResponse) {}
+    rpc InitiateRequest(InferenceRequest) returns (InferenceRequestAck) {}
+    rpc IntermediateRequest(InferenceRequest) returns (InferenceRequestAck) {}
+    rpc SetRoutingTable(RoutingTableRequest) returns (RoutingTableResponse) {}
+}
+
+message HeartbeatRequest {
+    string message = 1;
+}
+
+message HeartbeatResponse {
+    string message = 1;
+    uint32 queriesSinceHeartbeat = 2;
+    uint32 totalQueries = 3;
+    uint32 queueSize = 4;
+    int32 onCUDA = 5;
+    bytes branchingSinceHeartbeat = 6;
+    bytes queriesTimestampSinceHearbeat = 7;
+}
+
+enum LoadModelEnum {
+    LOAD_INITIATED = 0;
+    LOADED_FROM_STORAGE = 1;
+    LOADED_FROM_NETWORK = 2;
+    LOAD_FAILED = 3;
+}
+
+message LoadModelRequest {
+    string modelName = 1;
+    string schedulerName = 2;
+    int32 infer_level = 3;
+    float conf_thres = 4;
+    int32 batch_size = 5;
+    string applicationID = 6;
+    string task = 7;
+    optional bytes childrenTasks = 8;
+    optional bytes labelToChildrenTasks = 9;
+}
+
+message LoadModelResponse {
+    LoadModelEnum response = 1;
+    optional uint32 loadingTimeInUSec = 2;
+    optional string message = 3;
+}
+
+enum RequestStatus {
+    ACCEPTED = 0;
+    PROCESSING = 1;
+    COMPLETED = 2;
+    REQUEST_FAILED = 3;
+    REQUEST_FAILED_RETRY = 4;
+    INVALID_APPLICATION = 5;
+}
+
+message InferenceRequest {
+    string requestID = 1;
+    string queryID = 2;
+    string userID = 3;
+    string applicationID = 4;
+    optional string prompt = 5;
+    optional bytes data = 6;
+    optional int32 resultQualified = 7;
+    optional uint32 latencySLOInUSec = 8;
+    optional uint32 sequenceNum = 9;
+    optional double timestamp = 10;
+    optional float processingTime = 11;
+}
+
+message InferenceRequestAck {
+    string requestID = 1;
+    RequestStatus status = 2;
+    optional string message = 3;
+}
+
+message RoutingTableRequest {
+    bytes routingTable = 1;
+}
+
+message RoutingTableResponse {
+    string message = 1;
+}
+
+// 1. Who is responsible for tracking the status of the request as it progresses?
+// 2. Is it the client who has to send out heartbeats? Is it the worker currently
+//    processing it?
+// 3. Who can the client query to get the current status? Since the request may be travelling
+// Perhaps the answer to 3 can be sink

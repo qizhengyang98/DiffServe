@@ -1,0 +1,35 @@
+{
+    "appID": "123",
+    "appName": "traffic_analysis",
+    "latencySLOInMSec": 500,
+    "root": {
+        "task": "object_detection",
+        "model_variants": ["yolov5n", "yolov5s", "yolov5m", "yolov5l", "yolov5x"],
+        "children": [
+            {
+                "task": "car_classification",
+                "label": 2,
+                "model_variants": ["eb0", "eb1", "eb2", "eb3", "eb4", "eb5", "eb6"],
+                "children": [
+                    {
+                        "task": "sink",
+                        "model_variants": ["sink"],
+                        "children": []
+                    }
+                ]
+            },
+            {
+                "task": "facial_recognition",
+                "label": 0,
+                "model_variants": ["resnet50", "senet50", "vgg16"],
+                "children": [
+                    {
+                        "task": "sink",
+                        "model_variants": ["sink"],
+                        "children": []
+                    }
+                ]
+            }
+        ]
+    }
+}

@@ -1,0 +1,26 @@
+
+syntax = "proto3";
+
+package pipescaler;
+
+import "protos/worker.proto";
+
+service Client {
+    rpc FinishRequest(InferenceResponse) returns (InferenceResponseAck) {}
+    rpc SetRoutingTable(RoutingTableRequest) returns (RoutingTableResponse) {}
+}
+
+message InferenceResponse {
+    string userID = 1;
+    string applicationID = 2;
+    string requestID = 3;
+    repeated bytes data = 4;
+    RequestStatus status = 5;
+}
+
+message InferenceResponseAck {
+    string userID = 1;
+    string applicationID = 2;
+    string requestID = 3;
+    optional string message = 4;
+}
