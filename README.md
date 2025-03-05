@@ -37,7 +37,7 @@ To use DiffServe, we recomment obtaining a Gurobi license. You need to obtain a 
 ### Preparation
 To run all the benchmarks and reproduce the results in the experiments, firstly prepare the necessary datasets and pre-trained discriminators.
 
-To prepare them automatically, you can simply run the script *prepare\_ds\_mod.sh*, which downloads all datasets and models and puts them under the correct paths, after installing *gdown* package by
+To prepare them automatically, you can simply run the script `prepare\_ds\_mod.sh`, which downloads all datasets and models and puts them under the correct paths, after installing *gdown* package by
 ```
 pip install gdown
 ```
