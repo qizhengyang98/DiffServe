@@ -21,7 +21,7 @@ from diffusers import DiffusionPipeline, DDIMScheduler, StableDiffusionPipeline,
 from huggingface_hub import hf_hub_download
 from safetensors.torch import load_file
 import torchvision.transforms as transforms
-from config import get_cas_exec
+from config import get_cas_exec, get_do_simulate
 
 
 class EfficientNet(nn.Module):
@@ -48,7 +48,6 @@ MSECONDS_IN_SEC = 1000
 SLO_FACTOR = 1.5
 lock = threading.Lock()
 
-DO_SIMULATE = True
 
 class ModelState(Enum):
     READY = 1
@@ -90,16 +89,17 @@ class LoadedModel:
         self.light_model_args = (None, None, None)
         self.heavy_model_args = (None, None, None)
         
+        self.do_simulate = get_do_simulate()
         # TODO: get the runtime during the inference
-        PIPELINE = get_cas_exec()
-        logging.info(f"Current cascade pipeline: {PIPELINE}")
-        if PIPELINE == 'sdturbo':
+        self.pipeline = get_cas_exec()
+        logging.info(f"Current cascade pipeline: {self.pipeline}")
+        if self.pipeline == 'sdturbo':
             executionProfiles = pd.read_csv('../../profiling/stable_diffusion_runtimes_sdturbo.csv')
             self.conf_dist_path = os.path.join(self.modelDir, f'dist_sdturbo.txt')
-        elif PIPELINE == 'sdxs':
+        elif self.pipeline == 'sdxs':
             executionProfiles = pd.read_csv('../../profiling/stable_diffusion_runtimes_sdxs.csv')
             self.conf_dist_path = os.path.join(self.modelDir, f'dist_sdxs.txt')
-        elif PIPELINE == 'sdxlltn':
+        elif self.pipeline == 'sdxlltn':
             executionProfiles = pd.read_csv('../../profiling/stable_diffusion_runtimes_sdxlltn.csv')
             self.conf_dist_path = os.path.join(self.modelDir, f'dist_sdxlltn.txt')
             
@@ -165,7 +165,8 @@ class LoadedModel:
             self.model(**self.get_inputs("Just for warm up.", 1))
         # logging.info(f'self.light_model_args: {self.light_model_args}')
         # logging.info(f'self.heavy_model_args: {self.heavy_model_args}')
-        modelPath = os.path.join(self.modelDir, f'sdturbo.pt')
+        # modelPath = os.path.join(self.modelDir, f'sdturbo.pt')
+        modelPath = os.path.join(self.modelDir, f'{self.pipeline}.pt')
         self.discriminator = torch.load(modelPath).cuda().eval()
 
         
@@ -177,7 +178,7 @@ class LoadedModel:
             return 'storage', 0
             
         if self.light_model_args[0] is None or self.heavy_model_args[0] is None:
-            if DO_SIMULATE:
+            if self.do_simulate:
                 self.light_model_args = ('sdturbo', 0, 1)
                 self.heavy_model_args = ('sdv15', None, 50)
                 self.discriminator = 'discriminator'
@@ -388,7 +389,7 @@ class LoadedModel:
             batch_size = len(data_prompts) # The batch_size here is 'How many images are generated per prompt', not equal to self.batch_size
             logging.info(f"Start image generation for batch size {batch_size}")
             start_time = time.time()
-            if DO_SIMULATE:
+            if self.do_simulate:
                 bs = batch_size if batch_size in [1,2,3,4,5,6,7,8,16,32] else 4
                 time.sleep(self.profiled_runtimes[(self.modelName, self.modelName, bs)] / MSECONDS_IN_SEC)
                 results = torch.randn(bs, 3, 224, 224)
@@ -408,7 +409,7 @@ class LoadedModel:
                     image_tensors = torch.stack([transform(results.images[i]) for i in range(batch_size)])
                 # image_tensors = image_tensors.cuda()
                 softmax = nn.Softmax()
-                if DO_SIMULATE:
+                if self.do_simulate:
                     time.sleep(0.02)
                 else:
                     conf_scores = self.discriminator(image_tensors)

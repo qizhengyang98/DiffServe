@@ -1,10 +1,9 @@
 *.pdf
 *.jpg
 *.pyc
-*.csv
+logs/*.csv
 *.log
 *.pt
-*.txt
 .DS_Store
 .ipynb_checkpoints/
 *.ipynb

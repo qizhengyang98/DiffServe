@@ -299,8 +299,8 @@ def serve(args):
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     
     textpath = "../../traces/text_prompt_mscoco_120k.txt"
-    tracePath = "../../traces/maf/sdturbo_sdv15_dynamic_testbed/trace_4to32qps.txt" # 2to16, 2_5to20, 3to24, 3_5to28, 4to32, 3to40, 3_5to40
-    # tracePath = "../../traces/maf/sdturbo_sdv15_dynamic_testbed/trace_1to8qps.txt" # 1to8, 2to10
+    tracePath = f"../../traces/maf/sdturbo_sdv15_dynamic_testbed/trace_{args.trace}qps.txt"
+    # tracePath = "../../traces/maf/sdturbo_sdv15_dynamic_testbed/trace_4to32qps.txt" # 2to16, 2_5to20, 3to24, 3_5to28, 4to32, 3to40, 3_5to40, 1to8, 2to10
     client = ClientDaemon(ip=ip, port=port, lbIP=lbIP, lbPort=lbPort, dataPath=textpath, tracePath=tracePath)
     client_pb2_grpc.add_ClientServicer_to_server(client, server)
     server.add_insecure_port(f'[::]:{port}')
@@ -319,6 +319,8 @@ def getargs():
                         default='localhost', help='IP address of the load balancer')
     parser.add_argument('--lb_port', '-lbport', required=False, dest='lbPort',
                         default='50048', help='Port of the load balancer')
+    parser.add_argument('--trace_file', '-trace', required=False, dest='trace',
+                        default='4to32', help='The trace file used for client')
 
     return parser.parse_args()
 

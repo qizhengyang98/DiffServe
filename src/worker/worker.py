@@ -20,7 +20,7 @@ from common.host import getRoutingTableStr
 from protos import worker_pb2, worker_pb2_grpc
 from protos import controller_pb2, controller_pb2_grpc
 from protos import load_balancer_pb2, load_balancer_pb2_grpc
-from config import set_cas_exec
+from config import set_cas_exec, set_do_simulate_true
 
 
 lock = threading.Lock()
@@ -512,6 +512,9 @@ def serve(args):
     controllerPort = args.controllerPort
     set_cas_exec(args.cascadeExec)
     
+    if args.do_simulate:
+        set_do_simulate_true()
+    
     # logfile_name = f'../../logs/worker_{time.time()}.log'
     logfile_name = f'../../logs/worker_{workerPort}.log'
     logging.basicConfig(filename=logfile_name, level=logging.INFO, 
@@ -541,6 +544,8 @@ def getargs():
     parser.add_argument('--cascade', '-c', required=True,
                        dest='cascadeExec', choices=['sdturbo', 'sdxs', 'sdxlltn'],
                        help=(f'The cascade pipeline to execute.'))
+    parser.add_argument('--do_simulate', action=argparse.BooleanOptionalAction, default=False,
+                        help='Enable workers simulate the execution of models (default: False)')
 
     return parser.parse_args()
 

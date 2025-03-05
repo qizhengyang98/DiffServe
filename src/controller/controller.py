@@ -97,8 +97,8 @@ class Controller(controller_pb2_grpc.ControllerServicer):
         self.conf_thres = 1
 
         # TODO: update execution and branching profiles based on real-time data
-        self.executionProfiles = pd.read_csv('../../profiling/profiled/runtimes_all_vgghardcoded.csv')
-        self.branchingProfiles = pd.read_csv('../../profiling/profiled/branching.csv')
+        self.executionProfiles = None
+        self.branchingProfiles = None
         
         # save request processing time, for the computation of SLO violations
         self.queriesStartTime = {}
