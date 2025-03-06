@@ -44,7 +44,7 @@ pip install gdown
 Alternatively, you can manually download them from [Google Drive](https://drive.google.com/drive/folders/1Dtvd5eIDeDiseCAwCrj3_wrqjWsy3bq3?usp=sharing). Then put the models(txt and pt files) under the `models` folder, and put the datasets(zip files) under `datasets` and unzip them.
 
 ### Experiments
-We provide the end-to-end experiments for all cascade pipelines used in our paper and corresponding trace files. 
+We provide the end-to-end experiments for all cascade pipelines used in our paper and corresponding trace files. [Here](experiment.md) are step-by-step instructions on how to execute the experiments.
 
 # Citation
 Welcome to cite our work if you find it helpful to your research
