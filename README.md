@@ -20,7 +20,7 @@ Necessary dependencies are listed in the requirements.txt. A Conda environment i
 ### Conda environment setup
 To set up the environments, firstly clone the repository. Go to the root folder and create a conda environment:
 ```
-conda create -n diffserve python=3.10 ;
+conda create -n diffserve python=3.8 ;
 conda activate diffserve 
 ```
 Then install all the necessary dependencies:
@@ -37,11 +37,7 @@ To use DiffServe, we recomment obtaining a Gurobi license. You need to obtain a 
 ### Preparation
 To run all the benchmarks and reproduce the results in the experiments, firstly prepare the necessary datasets and pre-trained discriminators.
 
-To prepare them automatically, you can simply run the script `prepare_ds_mod.sh`, which downloads all datasets and models and puts them under the correct paths, after installing *gdown* package by
-```
-pip install gdown
-```
-Alternatively, you can manually download them from [Google Drive](https://drive.google.com/drive/folders/1Dtvd5eIDeDiseCAwCrj3_wrqjWsy3bq3?usp=sharing). Then put the models(txt and pt files) under the `models` folder, and put the datasets(zip files) under `datasets` and unzip them.
+To prepare them automatically, you can simply run the script `prepare_ds_mod.sh`, which downloads all datasets and models and puts them under the correct paths.
 
 ### Experiments
 We provide the end-to-end experiments for all cascade pipelines used in our paper and corresponding trace files. [Here](experiment.md) are step-by-step instructions on how to execute the experiments.
