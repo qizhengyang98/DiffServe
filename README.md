@@ -35,7 +35,11 @@ To use DiffServe, we recomment obtaining a Gurobi license. You need to obtain a 
 
 ## Run Experiments
 ### Preparation
-To run all the benchmarks and reproduce the results in the experiments, you can download the pre-trained discriminators by simply running the script `prepare_ds_mod.sh`, which automatically downloads all models from [Google Drive](https://drive.google.com/drive/folders/1gF1wKHxaA1DAnAkeDBGvuoHPS7aSRaYz?usp=sharing) and puts them under the correct paths.
+To run all the benchmarks and reproduce the results in the experiments, you can download the pre-trained discriminators by simply running
+```
+python prepare_ds_mod.py
+```
+under the conda environment, which automatically downloads all models from [Google Drive](https://drive.google.com/drive/folders/1gF1wKHxaA1DAnAkeDBGvuoHPS7aSRaYz?usp=sharing) and puts them under the correct paths.
 
 ### Experiments
 We provide the end-to-end experiments for all cascade pipelines used in our paper and corresponding trace files. [Here](experiment.md) are step-by-step instructions on how to execute the experiments.
