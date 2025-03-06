@@ -12,7 +12,6 @@ from config import get_cas_exec
 MSecsInSec = 1000
 USecsInSec = 1000 * 1000
 
-# PIPELINE = get_cas_exec()
 
 class SchedulingAlgorithm:
     def __init__(self, algorithm='base'):

@@ -27,7 +27,7 @@ lock = threading.Lock()
 
 class WorkerDaemon(worker_pb2_grpc.WorkerDaemonServicer):
     def __init__(self, workerIP: str, workerPort: str, controllerIP: str,
-                 controllerPort: str):
+                 controllerPort: str, is_sink=False):
         self.hostID = str(uuid.uuid4())
 
         self.appID = ''
@@ -61,7 +61,8 @@ class WorkerDaemon(worker_pb2_grpc.WorkerDaemonServicer):
         self.infer_level = None
         self.conf_thres = None
         self.batch_size = None
-        self.onCUDA = int(torch.cuda.is_available())
+        
+        self.onCUDA = 0 if is_sink else int(torch.cuda.is_available())
 
         self.stats = {'queries_received': 0, 'queries_since_heartbeat': 0,
                       'queue_size': 0, 'branching': {}, 'branching_since_heartbeat': {}, 
@@ -510,6 +511,7 @@ def serve(args):
     workerPort = args.workerPort
     controllerIP = args.controllerIP
     controllerPort = args.controllerPort
+    is_sink = args.is_sink
     set_cas_exec(args.cascadeExec)
     
     if args.do_simulate:
@@ -522,7 +524,8 @@ def serve(args):
     
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=None))
     workerDaemon = WorkerDaemon(workerIP=workerIP, workerPort=workerPort,
-                                controllerIP=controllerIP, controllerPort=controllerPort)
+                                controllerIP=controllerIP, controllerPort=controllerPort, 
+                                is_sink=is_sink)
     worker_pb2_grpc.add_WorkerDaemonServicer_to_server(workerDaemon, server)
     server.add_insecure_port(f'[::]:{workerPort}')
     server.start()
@@ -544,7 +547,9 @@ def getargs():
     parser.add_argument('--cascade', '-c', required=True,
                        dest='cascadeExec', choices=['sdturbo', 'sdxs', 'sdxlltn'],
                        help=(f'The cascade pipeline to execute.'))
-    parser.add_argument('--do_simulate', action=argparse.BooleanOptionalAction, default=False,
+    parser.add_argument('--is_sink', action='store_true', default=False,
+                        help='Whether to set the worker as sink (default: False)')
+    parser.add_argument('--do_simulate', action='store_true', default=False,
                         help='Enable workers simulate the execution of models (default: False)')
 
     return parser.parse_args()
