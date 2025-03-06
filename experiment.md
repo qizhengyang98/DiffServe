@@ -17,7 +17,7 @@ In the following steps, {*Step Num.-R*} means steps for doing real execution of 
 - `Step 6-R`: In `tmux sink` terminal, run `start_worker_sink.sh` which starts the sink worker process.
 - `Step 7-R`: In each terminal of GPU server, modify the number after `-p` in `start_worker.sh`, then run the script. This number is the port number of each worker. Make sure the number you assign to each worker is unique, and is between [50051, 50066].
 - `Step 8-R`: If all the processes have been set up successfully, there will be logs corresponding to each process under the folder `logs`. The logs include `controller`, `load_balancer`, `worker_{port number}`, and `model_{port number}`.
-- `Step 9-R`: Then in `tmux client`, run `start_client.sh` to start the client process, which keeps sending queries in the 6 minutes.
+- `Step 9-R`: Then in `tmux client`, run `start_client.sh` to start the client process, which keeps sending queries in the 6 minutes. Modify the flag `-trace` given the number of workers you allocate. Use `1to8qps`, `2to16qps`, `2_5to20qps`, `3to24qps`, `4to32qps` if you have ~4, 8, 10, 12, 16 workers, respectively.
 - `Step 10-R`: The Client process will report `"Trace ended"` when it stops sending queries. Then stop all the processes.
 - `Step 11-R`: Under folder `logs`, there will be three csv files which contains the end-to-end experiment results. To generate graphs, go to folder `plotting`, and run the script `run_plot_results.sh`.
 
