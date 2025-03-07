@@ -28,9 +28,9 @@ For simulated execution,
 - `Step 2.3-S`: In `start_worker.sh`, add a flag `--do_simulate` at the end of the python command.
 - `Step (3-11)-S`: Steps 3-10 are the same as Step 3-R to Step 11-R explained above.
 
-The above steps describe the end-to-end experiment flow of cascade 1. To run experiments for cascade 2 and 3, simply replace the flag `-c sdturbo` to `-c sdxs` and `-c sdxlltn` in all shell scripts under the root folder, then follow the same steps.
+The above steps describe the end-to-end experiment flow of cascade 1. To run experiments for cascade 2 and 3, simply replace the flag `-c sdturbo` to `-c sdxs` and `-c sdxlltn` in all shell scripts under the root folder, then follow the same steps. For cascade 3, it is recommended to use simulated execution when the number of GPUs is less than 16, as the controller may struggle to find a solution due to insufficient available workers.
 
 ## Evaluation
 The testbed produces log files in the `logs` folder. The logs files contains snapshots of the system at regular intervals, including resource managements, user demands, system capacity, requests served/dropped/late, and confidence thresholds set given the demand changes.
 
-The python script `plotting/plot_results.py` can generate three graphs with the logs: confidence threshold over time, slo violation ratio over time, and FID score over time, which should be similar to the one in Figure 5. The script also prints the average SLO violation ratio and average FID score, which should be similar to those in Figure 6. To generate the graphs, simply modify the flag `--cascade` with [sdturbo, sdxs, sdxlltn] for different cascades, then run the script `run_plot_results.sh`. 
+The python script `plotting/plot_results.py` can generate three graphs with the logs: confidence threshold over time, slo violation ratio over time, and FID score over time, which should be similar to the one in Figure 5. The script also prints the average SLO violation ratio and average FID score, which should be similar to those in Figure 6. The results can vary slightly given different hardwares and trace files in use. To generate the graphs, simply modify the flag `--cascade` with [sdturbo, sdxs, sdxlltn] for different cascades, then run the script `run_plot_results.sh`. 
