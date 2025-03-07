@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 
 df = pd.read_csv('original_invocations.csv')
 
-transform_min = 50
-transform_max = 425
+transform_min = 1
+transform_max = 2
 transform_difference = transform_max - transform_min
 
 original_invocations = df['invocations'].values

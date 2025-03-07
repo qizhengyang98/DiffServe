@@ -155,8 +155,15 @@ class LoadedModel:
             
             
     def loadAllModels(self):
-        self.light_model_args = self.pipe_load('sdturbo', 'default')
-        self.heavy_model_args = self.pipe_load('sdv15', 'ddim')
+        if self.pipeline == 'sdturbo':
+            self.light_model_args = self.pipe_load('sdturbo', 'default')
+            self.heavy_model_args = self.pipe_load('sdv15', 'ddim')
+        elif self.pipeline == 'sdxs':
+            self.light_model_args = self.pipe_load('sdxs', 'default')
+            self.heavy_model_args = self.pipe_load('sdv15', 'ddim')
+        elif self.pipeline == 'sdxlltn':
+            self.light_model_args = self.pipe_load('sdxl-lightning', 'default')
+            self.heavy_model_args = self.pipe_load('sdxl', 'default')
         # warm-up
         for i in range(1):
             self.model, self.g_scale, self.n_steps = self.light_model_args
@@ -202,6 +209,7 @@ class LoadedModel:
 
     
     def pipe_load(self, model_name: str, scheduler='default'):
+        hf_cache_dir = "../../models"
         if model_name == 'sd21':
             model_id = "stabilityai/stable-diffusion-2-1-base"
             scheduler = DDIMScheduler.from_pretrained(model_id, subfolder="scheduler")
@@ -210,12 +218,12 @@ class LoadedModel:
             n_steps = 50
         elif model_name == 'sdxl':
             model_id = "stabilityai/stable-diffusion-xl-base-1.0"
-            pipe = DiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float16, use_safetensors=True, variant="fp16")
+            pipe = DiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float16, use_safetensors=True, variant="fp16", cache_dir=hf_cache_dir)
             g_scale = None
             n_steps = 50
         elif model_name == 'sdv15':
             model_id = "runwayml/stable-diffusion-v1-5"
-            pipe = StableDiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float16, variant="fp16")
+            pipe = StableDiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float16, variant="fp16", cache_dir=hf_cache_dir)
             g_scale = None
             n_steps = 50
         elif model_name == 'sdxl-turbo':
@@ -243,19 +251,19 @@ class LoadedModel:
             repo = "ByteDance/SDXL-Lightning"
             ckpt = "sdxl_lightning_2step_unet.safetensors"
             unet = UNet2DConditionModel.from_config(base, subfolder="unet").to("cuda", torch.float16)
-            unet.load_state_dict(load_file(hf_hub_download(repo, ckpt), device="cuda"))
-            pipe = StableDiffusionXLPipeline.from_pretrained(base, unet=unet, torch_dtype=torch.float16, variant="fp16")
+            unet.load_state_dict(load_file(hf_hub_download(repo, ckpt, cache_dir=hf_cache_dir), device="cuda"))
+            pipe = StableDiffusionXLPipeline.from_pretrained(base, unet=unet, torch_dtype=torch.float16, variant="fp16", cache_dir=hf_cache_dir)
             pipe.scheduler = EulerDiscreteScheduler.from_config(pipe.scheduler.config, timestep_spacing="trailing")
             g_scale = 0
             n_steps = 2
         elif model_name == 'sdturbo':
             model_id = "stabilityai/sd-turbo"
-            pipe = AutoPipelineForText2Image.from_pretrained(model_id, torch_dtype=torch.float16, variant="fp16")
+            pipe = AutoPipelineForText2Image.from_pretrained(model_id, torch_dtype=torch.float16, variant="fp16", cache_dir=hf_cache_dir)
             g_scale = 0.0
             n_steps = 1
         elif model_name == 'sdxs':
             model_id = "IDKiro/sdxs-512-0.9"
-            pipe = StableDiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float16)
+            pipe = StableDiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float16, cache_dir=hf_cache_dir)
             g_scale = 0
             n_steps = 1
         elif model_name == 'tinysd':
@@ -407,7 +415,7 @@ class LoadedModel:
                     image_tensors = results
                 else:
                     image_tensors = torch.stack([transform(results.images[i]) for i in range(batch_size)])
-                # image_tensors = image_tensors.cuda()
+                image_tensors = image_tensors.cuda()
                 softmax = nn.Softmax()
                 if self.do_simulate:
                     time.sleep(0.02)
@@ -551,6 +559,7 @@ class LoadedModel:
                 print(f'\tchildrenTasks: {self.childrenTasks}')
                 print(f'\tlabel_to_task: {self.label_to_task}')
                 print((f'\tinfer_level: {infer_level}'))
+                print(f'Model loaded, Worker is ready.')
                 # logging.info(f'\tchildrenTasks: {self.childrenTasks}')
                 # logging.info(f'\tlabel_to_task: {self.label_to_task}')
                 logging.info(f"Check LOAD_MODEL, task: {self.task}")

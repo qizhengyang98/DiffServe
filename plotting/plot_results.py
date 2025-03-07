@@ -105,8 +105,15 @@ plt.close()
 """
 FID scores
 """
+if args.cascade == 'sdturbo':
+    fid_min, fid_max, scale_factor = 16, 23, 0.08
+elif args.cascade == 'sdxs':
+    fid_min, fid_max, scale_factor = 16, 25, 0.04
+elif args.cascade == 'sdxlltn':
+    fid_min, fid_max, scale_factor = 23, 33, -0.1
+
 query_file = f'{log_folder}/query_num_per_second.csv'
-query_data = pd.read_csv(query_file)
+query_data = pd.read_csv(query_file)[:end_point]
 light_per_second = query_data['sdturbo'].groupby(query_data['sdturbo'].index // chunk_size).sum().to_list()
 heavy_per_second  = query_data['sdv15'].groupby(query_data['sdv15'].index // chunk_size).sum().to_list()
 
@@ -116,18 +123,11 @@ for i in range(len(light_per_second)):
         ratio = heavy_per_second[i] / light_per_second[i]
         ratio_per_second.append(ratio)
 ratio_per_second = ratio_per_second / np.max(ratio_per_second) 
-fid_per_second = [interpolated_fid_score(1-ft+0.04, args.cascade) for ft in ratio_per_second]
+fid_per_second = [interpolated_fid_score(1-ft+scale_factor, args.cascade) for ft in ratio_per_second]
 
 smoothed_fid_per_second = np.convolve(fid_per_second, np.ones(chunk_size)/chunk_size, mode='valid')
 mean_fid = np.mean(smoothed_fid_per_second)
 print(f"Mean FID: {mean_fid}")
-
-if args.cascade == 'sdturbo':
-    fid_min, fid_max = 16, 23
-elif args.cascade == 'sdxs':
-    fid_min, fid_max = 16, 25
-elif args.cascade == 'sdxlltn':
-    fid_min, fid_max = 23, 33
 
 plt.plot(time_frame[:len(smoothed_fid_per_second)], smoothed_fid_per_second, label=args.cascade)
 plt.yticks(np.arange(fid_min, fid_max, 1))
