@@ -20,13 +20,14 @@ In the following steps, {*Step Num.-R*} means steps for doing real execution of 
 - `Step 9-R`: Then in `tmux client`, run `start_client.sh` to start the client process, which keeps sending queries in the 6 minutes. Modify the flag `-trace` given the number of workers you allocate. Use `1to8qps`, `2to16qps`, `2_5to20qps`, `3to24qps`, `4to32qps` if you have ~4, 8, 10, 12, 16 workers, respectively.
 - `Step 10-R`: The Client process will report `"Trace ended"` when it stops sending queries. Then stop all the processes.
 - `Step 11-R`: Under folder `logs`, there will be three csv files which contains the end-to-end experiment results. To generate graphs, go to folder `plotting`, and run the script `run_plot_results.sh`.
+- `Step 12-R`: Be sure to remove all the log files before starting a new expriment.
 
 For simulated execution,
 - `Step 1-S`: For preparation, open one or multiple terminals on each GPU server and 4 terminals on CPU server. The total number of terminals on GPU servers should be equal to the total number of workers you want to allocate.
 - `Step 2.1-S`: In the terminals of the CPU server, run `tmux new -s contr`, `tmux new -s loadb`, `tmux new -s sink`, `tmux new -s client`, respectively.
 - `Step 2.2-S`: In each terminal of the GPU servers, run `tmux new -s workerX` respectively, where *X* is a number or character. Making sure *X* is unique to each terminal on a single server.
 - `Step 2.3-S`: In `start_worker.sh`, add a flag `--do_simulate` at the end of the python command.
-- `Step (3-11)-S`: Steps 3-10 are the same as Step 3-R to Step 11-R explained above.
+- `Step (3-12)-S`: Steps 3-12 are the same as Step 3-R to Step 12-R explained above.
 
 The above steps describe the end-to-end experiment flow of cascade 1. To run experiments for cascade 2 and 3, simply replace the flag `-c sdturbo` to `-c sdxs` and `-c sdxlltn` in all shell scripts under the root folder, then follow the same steps. For cascade 3, it is recommended to use simulated execution when the number of GPUs is less than 16, as the controller may struggle to find a solution due to insufficient available workers.
 
